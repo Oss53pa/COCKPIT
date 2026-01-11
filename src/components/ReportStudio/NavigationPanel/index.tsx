@@ -1,0 +1,168 @@
+/**
+ * Navigation Panel Component
+ * Left sidebar with document outline and sections
+ */
+
+import React, { useState, useCallback } from 'react';
+import { ChevronRight, ChevronLeft, Search, Plus } from 'lucide-react';
+import { Section } from '../../../types/reportStudio';
+import { SectionItem } from './SectionItem';
+
+interface NavigationPanelProps {
+  sections: Section[];
+  selectedSectionId: string | null;
+  collapsed: boolean;
+  onSectionClick: (sectionId: string) => void;
+  onSectionEdit: (sectionId: string) => void;
+  onReorder: (sections: Section[]) => void;
+  onAddSection: (parentId?: string) => void;
+  onCollapse: () => void;
+}
+
+export const NavigationPanel: React.FC<NavigationPanelProps> = ({
+  sections,
+  selectedSectionId,
+  collapsed,
+  onSectionClick,
+  onSectionEdit,
+  onReorder,
+  onAddSection,
+  onCollapse,
+}) => {
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(sections.map(s => s.id))
+  );
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const toggleExpand = useCallback((sectionId: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) {
+        next.delete(sectionId);
+      } else {
+        next.add(sectionId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleDragEnd = useCallback((draggedId: string, targetId: string) => {
+    const oldIndex = sections.findIndex(s => s.id === draggedId);
+    const newIndex = sections.findIndex(s => s.id === targetId);
+
+    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+      const newSections = [...sections];
+      const [removed] = newSections.splice(oldIndex, 1);
+      newSections.splice(newIndex, 0, removed);
+      onReorder(newSections);
+    }
+  }, [sections, onReorder]);
+
+  const filteredSections = searchQuery
+    ? sections.filter(s =>
+        s.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : sections;
+
+  if (collapsed) {
+    return (
+      <div className="w-12 bg-white border-r border-primary-200 flex flex-col items-center py-4">
+        <button
+          onClick={onCollapse}
+          className="p-2 hover:bg-primary-100 rounded-lg mb-4"
+          title="Développer le panneau"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
+        {/* Mini section indicators */}
+        <div className="space-y-2">
+          {sections.slice(0, 8).map((section, index) => (
+            <button
+              key={section.id}
+              onClick={() => onSectionClick(section.id)}
+              className={`w-8 h-8 rounded flex items-center justify-center text-xs font-medium ${
+                selectedSectionId === section.id
+                  ? 'bg-primary text-white'
+                  : 'bg-primary-100 text-primary-600 hover:bg-primary-200'
+              }`}
+              title={section.title}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-72 bg-white border-r border-primary-200 flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b border-primary-200">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-primary-900">Plan du document</h2>
+          <button
+            onClick={onCollapse}
+            className="p-1 hover:bg-primary-100 rounded"
+            title="Réduire le panneau"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary-400" />
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-sm border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Sections list */}
+      <div className="flex-1 overflow-y-auto p-2">
+        {filteredSections.map((section) => (
+          <SectionItem
+            key={section.id}
+            section={section}
+            isSelected={selectedSectionId === section.id}
+            isExpanded={expandedSections.has(section.id)}
+            depth={0}
+            onClick={() => onSectionClick(section.id)}
+            onDoubleClick={() => onSectionEdit(section.id)}
+            onToggleExpand={() => toggleExpand(section.id)}
+            onAddChild={() => onAddSection(section.id)}
+            onDragEnd={handleDragEnd}
+          />
+        ))}
+
+        {/* Empty state */}
+        {filteredSections.length === 0 && (
+          <div className="text-center py-8 text-primary-500">
+            {searchQuery ? (
+              <p>Aucune section trouvée</p>
+            ) : (
+              <p>Aucune section</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Add section button */}
+      <div className="p-4 border-t border-primary-200">
+        <button
+          onClick={() => onAddSection()}
+          className="w-full px-4 py-2 text-sm text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Ajouter une section
+        </button>
+      </div>
+    </div>
+  );
+};

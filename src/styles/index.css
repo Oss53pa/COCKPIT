@@ -1,0 +1,138 @@
+/**
+ * Styles - Point d'entrée CSS
+ * Importe tous les styles de l'application
+ */
+
+/* Variables CSS globales */
+:root {
+  /* Couleurs primaires */
+  --color-primary-50: #f0f7ff;
+  --color-primary-100: #e0efff;
+  --color-primary-200: #baddff;
+  --color-primary-300: #7cc2ff;
+  --color-primary-400: #36a3ff;
+  --color-primary-500: #0c84ff;
+  --color-primary-600: #0066f5;
+  --color-primary-700: #0052e1;
+  --color-primary-800: #0545b6;
+  --color-primary-900: #1C3163;
+  --color-primary-950: #0a1e40;
+
+  /* Couleurs d'état */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Transitions */
+  --transition-fast: 150ms;
+  --transition-normal: 300ms;
+  --transition-slow: 500ms;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Mode sombre */
+.dark {
+  --color-primary-50: #0a1e40;
+  --color-primary-100: #0f2d5e;
+  --color-primary-200: #163d7e;
+  --color-primary-300: #1d4d9e;
+  --color-primary-400: #2563eb;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #60a5fa;
+  --color-primary-700: #93c5fd;
+  --color-primary-800: #bfdbfe;
+  --color-primary-900: #dbeafe;
+  --color-primary-950: #eff6ff;
+}
+
+/* Animations globales */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Classes utilitaires */
+.animate-fadeIn {
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn var(--transition-normal) ease-out;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+}
